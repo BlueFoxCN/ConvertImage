@@ -198,7 +198,7 @@ namespace ConvertImage
             else if (node.NodeType == NodeType.Shape && ((Shape)node).OleFormat != null)
             {
 
-                if (((Shape)node).OleFormat.ProgId.Contains("DSMT"))
+                if (((Shape)node).OleFormat.ProgId.Contains("DSMT") || ((Shape)node).OleFormat.ProgId.Contains("Equation.3"))
                 {
                     return new string[] { "mathtype", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
                 }
@@ -250,7 +250,7 @@ namespace ConvertImage
                 image.Transparent(new MagickColor("#FFFFFFFF"));
                 if (image.Format == MagickFormat.Wmf)
                 {
-                    image.Resize(new Percentage(0.35));
+                    image.Resize(new Percentage(0.1));
                 }
                 image.Write(path + "public\\download\\" + filename + ".png");
             }
@@ -260,6 +260,7 @@ namespace ConvertImage
         {
             Document doc = new Document(@Server.MapPath("templates") + "\\" + "mathtype.docx");
             Shape newShape = (Shape)doc.ImportNode(shape, true);
+            newShape.Font.Position = 0;
 
             DocumentBuilder builder = new DocumentBuilder(doc);
             builder.MoveToDocumentEnd();
