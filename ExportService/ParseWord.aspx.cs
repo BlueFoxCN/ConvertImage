@@ -69,7 +69,6 @@ namespace ConvertImage
         {
             ArrayList content = new ArrayList();
             string curText = "";
-            string suffix = "";
             string imgFileName = "";
             bool skip = false;
             foreach (Node node in p.GetChildNodes(NodeType.Any, false)) {
@@ -128,10 +127,13 @@ namespace ConvertImage
                     case "unknown":
                         curText += node.GetText();
                         break;
+                    case "mathtype":
+                        imgFileName = Guid.NewGuid().ToString();
+                        convertImage(node, imgFileName);
+                        saveMathtype((Shape)node, imgFileName);
+                        curText += "$$math_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
+                        break;
                     case "equation":
-                        suffix = getSuffix(node);
-                        if (suffix == "noimage")
-                            continue;
                         imgFileName = Guid.NewGuid().ToString();
                         convertImage(node, imgFileName);
                         curText += "$$equ_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
@@ -140,9 +142,6 @@ namespace ConvertImage
                         if (curText != "")
                             content.Add(curText);
                         curText = "";
-                        suffix = getSuffix(node);
-                        if (suffix == "noimage")
-                            continue;
                         imgFileName = Guid.NewGuid().ToString();
                         convertImage(node, imgFileName);
                         content.Add("$$fig_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$");
@@ -183,13 +182,31 @@ namespace ConvertImage
 
         public string[] judgeType(Node node)
         {
+            if (node.NodeType == NodeType.Shape && ((Shape)node).ImageData.ImageType.ToString().ToLower() == "noimage")
+            {
+                return new string[] { "unknown", "", "" };
+            }
+            if (node.NodeType == NodeType.DrawingML && ((DrawingML)node).ImageData.ImageType.ToString().ToLower() == "noimage")
+            {
+                return new string[] { "unknown", "", "" };
+            }
+
             if (node.NodeType == NodeType.Run || node.NodeType == NodeType.SmartTag)
             {
                 return new string[] {"text", "", ""};
             }
-            else if (node.NodeType == NodeType.Shape && ((Shape)node).ImageData.ImageType == ImageType.Wmf)
+            else if (node.NodeType == NodeType.Shape && ((Shape)node).OleFormat != null)
             {
-                return new string[] { "equation", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
+
+                if (((Shape)node).OleFormat.ProgId.Contains("DSMT"))
+                {
+                    return new string[] { "mathtype", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
+                }
+                else
+                {
+                    return new string[] { "unknown", "", "" };
+                }
+                
             }
             else if (node.NodeType == NodeType.Shape && !((Shape)node).IsInline)
             {
@@ -210,22 +227,6 @@ namespace ConvertImage
             else
             {
                 return new string[] { "unknown", "", "" };
-            }
-        }
-
-        public string getSuffix(Node node)
-        {
-            if (node.NodeType == NodeType.DrawingML)
-            {
-                return ((DrawingML)node).ImageData.ImageType.ToString().ToLower();
-            }
-            else if (node.NodeType == NodeType.Shape)
-            {
-                return ((Shape)node).ImageData.ImageType.ToString().ToLower();
-            }
-            else
-            {
-                return "";
             }
         }
 
@@ -253,6 +254,17 @@ namespace ConvertImage
                 }
                 image.Write(path + "public\\download\\" + filename + ".png");
             }
+        }
+
+        public void saveMathtype(Shape shape, string filename)
+        {
+            Document doc = new Document(@Server.MapPath("templates") + "\\" + "mathtype.docx");
+            Shape newShape = (Shape)doc.ImportNode(shape, true);
+
+            DocumentBuilder builder = new DocumentBuilder(doc);
+            builder.MoveToDocumentEnd();
+            builder.InsertNode(newShape);
+            doc.Save(path + "public\\mathtype\\" + filename + ".docx");
         }
     }
 }

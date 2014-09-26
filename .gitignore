@@ -1,3 +1,7 @@
+ExportService\log.txt
+ExportService\data\*
+ExportService\public\*
+
 #################
 ## Eclipse
 #################

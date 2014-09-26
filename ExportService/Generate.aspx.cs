@@ -187,7 +187,17 @@ namespace ConvertImage
             Shape shape;
             foreach (string ele in content)
             {
-                if (ele.StartsWith("equ_"))
+                if (ele.StartsWith("math_"))
+                {
+                    imageInfo = ele.Substring(5).Split('*');
+                    Document mathDoc = new Document(@Server.MapPath("public\\mathtype\\" + imageInfo[0] + ".docx"));
+                    Paragraph mathP = (Paragraph)mathDoc.Sections[0].Body.ChildNodes[0];
+                    Shape mathShape = (Shape)mathP.ChildNodes[2];
+
+                    Shape newShape = (Shape)builder.Document.ImportNode(mathShape, true);
+                    builder.InsertNode(newShape);
+                }
+                else if (ele.StartsWith("equ_"))
                 {
                     imageInfo = ele.Substring(4).Split('*');
                     shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
