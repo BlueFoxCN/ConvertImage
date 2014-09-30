@@ -50,33 +50,36 @@ namespace ConvertImage
 
                 foreach (dynamic q in questions)
                 {
-                    // first get the qr_code image
-                    qrcode_path = @Server.MapPath("public\\qrcodes\\" + q.link + ".png");
-                    if (!File.Exists(qrcode_path))
+                    if (q.link != null)
                     {
-                        HttpWebRequest httpRequest = (HttpWebRequest)
-                        WebRequest.Create(QRCODE_HOST + "?link=" + q.link);
-                        httpRequest.Method = WebRequestMethods.Http.Get;
-
-                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                        // Stream httpResponseStream = httpResponse.GetResponseStream();
-                        using (Stream inputStream = httpResponse.GetResponseStream())
-                        using (Stream outputStream = File.OpenWrite(qrcode_path))
+                        // first get the qr_code image
+                        qrcode_path = @Server.MapPath("public\\qrcodes\\" + q.link + ".png");
+                        if (!File.Exists(qrcode_path))
                         {
-                            byte[] buffer = new byte[4096];
-                            int bytesRead;
-                            do
-                            {
-                                bytesRead = inputStream.Read(buffer, 0, buffer.Length);
-                                outputStream.Write(buffer, 0, bytesRead);
-                            } while (bytesRead != 0);
-                        }
-                    }
+                            HttpWebRequest httpRequest = (HttpWebRequest)
+                            WebRequest.Create(QRCODE_HOST + "?link=" + q.link);
+                            httpRequest.Method = WebRequestMethods.Http.Get;
 
-                    // shape = builder.InsertImage(httpResponseStream);
-                    shape = builder.InsertImage(qrcode_path);
-                    shape.WrapType = WrapType.Square;
-                    shape.Left = 370;
+                            HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                            // Stream httpResponseStream = httpResponse.GetResponseStream();
+                            using (Stream inputStream = httpResponse.GetResponseStream())
+                            using (Stream outputStream = File.OpenWrite(qrcode_path))
+                            {
+                                byte[] buffer = new byte[4096];
+                                int bytesRead;
+                                do
+                                {
+                                    bytesRead = inputStream.Read(buffer, 0, buffer.Length);
+                                    outputStream.Write(buffer, 0, bytesRead);
+                                } while (bytesRead != 0);
+                            }
+                        }
+
+                        // shape = builder.InsertImage(httpResponseStream);
+                        shape = builder.InsertImage(qrcode_path);
+                        shape.WrapType = WrapType.Square;
+                        shape.Left = 370;
+                    }
 
                     // insert the question content
                     foreach (dynamic para in q.content)
