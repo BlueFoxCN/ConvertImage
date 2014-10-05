@@ -20,7 +20,6 @@ namespace ConvertImage
     {
         private int[] LEN_THRESH = new int[] { 10, 20 };
         private int LINE_LEN = 80;
-        private string QRCODE_HOST = "http://b-fox.cn/qrcodes";
         protected void Page_Load(object sender, EventArgs e)
         {
             log4net.ILog log = log4net.LogManager.GetLogger(typeof(Generate));
@@ -44,6 +43,7 @@ namespace ConvertImage
 
                 ArrayList questions = new ArrayList(data.questions);
                 string fileName = data.name;
+                string qrcodeHost = data.qrcode_host;
 
                 Shape shape;
                 string qrcode_path = "";
@@ -57,11 +57,10 @@ namespace ConvertImage
                         if (!File.Exists(qrcode_path))
                         {
                             HttpWebRequest httpRequest = (HttpWebRequest)
-                            WebRequest.Create(QRCODE_HOST + "?link=" + q.link);
+                            WebRequest.Create(qrcodeHost + "/qrcodes?link=" + q.link);
                             httpRequest.Method = WebRequestMethods.Http.Get;
 
                             HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                            // Stream httpResponseStream = httpResponse.GetResponseStream();
                             using (Stream inputStream = httpResponse.GetResponseStream())
                             using (Stream outputStream = File.OpenWrite(qrcode_path))
                             {
