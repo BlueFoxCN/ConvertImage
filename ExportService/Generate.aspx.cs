@@ -174,8 +174,8 @@ namespace ConvertImage
 
         private void writeFigure(DocumentBuilder builder, string fig)
         {
-            string[] imageInfo = fig.Substring(4).Split('*');
-            Shape shape = builder.InsertImage("public\\download\\" + imageInfo[0] + ".png");
+            string[] imageInfo = fig.Substring(6, fig.Length - 8).Split('*');
+            Shape shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
             shape.Width = Convert.ToDouble(imageInfo[1]);
             shape.Height = Convert.ToDouble(imageInfo[2]);
             shape.WrapType = WrapType.Inline;
