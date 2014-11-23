@@ -42,8 +42,6 @@ namespace ConvertImage
                 ArrayList notes = new ArrayList(data);
                 string fileName = "错题本";
 
-                Shape shape;
-
                 foreach (dynamic q in notes)
                 {
                     // insert the question content

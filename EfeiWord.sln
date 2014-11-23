@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConvertImage", "ConvertImage", "{45818F75-C2ED-4F85-9F66-D29A4EAE5101}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EfeiWord", "EfeiWord", "{45818F75-C2ED-4F85-9F66-D29A4EAE5101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertImage", "ExportService\ConvertImage.csproj", "{41316CE8-733A-4E40-B1C5-66AEB0895EEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfeiWord", "ExportService\EfeiWord.csproj", "{41316CE8-733A-4E40-B1C5-66AEB0895EEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

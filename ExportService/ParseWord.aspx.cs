@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Aspose.Words;
 using Aspose.Words.Drawing;
+using Aspose.Words.Saving;
 using System.Collections;
 using ImageMagick;
 using System.Web.Script.Serialization;
@@ -72,7 +73,6 @@ namespace ConvertImage
             string imgFileName = "";
             bool skip = false;
             foreach (Node node in p.GetChildNodes(NodeType.Any, false)) {
-                
                 if (node.NodeType == NodeType.FieldStart)
                 {
                     skip = true;
@@ -115,6 +115,12 @@ namespace ConvertImage
                             }
                             else if (node.GetText() == "\v")
                             {
+                                content.Add(curText);
+                                curText = "";
+                            }
+                            else if (node.GetText() == "\f")
+                            {
+                                // issue 5_page_split
                                 content.Add(curText);
                                 curText = "";
                             }
@@ -224,6 +230,10 @@ namespace ConvertImage
             {
                 return new string[] { "equation", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
             }
+            else if (node.NodeType == NodeType.GroupShape)
+            {
+                return new string[] { "figure", ((GroupShape)node).Width.ToString(), ((GroupShape)node).Height.ToString() };
+            }
             else
             {
                 return new string[] { "unknown", "", "" };
@@ -233,9 +243,22 @@ namespace ConvertImage
         public void convertImage(Node node, string filename)
         {
             byte[] id;
+            ImageSaveOptions options = new Aspose.Words.Saving.ImageSaveOptions(SaveFormat.Png);
             if (node.NodeType == NodeType.Shape)
             {
+                // issue 1_clip
+                if (!((Shape)node).HasImage)
+                {
+                    ((Shape)node).GetShapeRenderer().Save(path + "public\\download\\" + filename + ".png", options);
+                    return;
+                }
                 id = ((Shape)node).ImageData.ToByteArray();
+            }
+            else if (node.NodeType == NodeType.GroupShape)
+            {
+                // issue 2_word_image
+                ((GroupShape)node).GetShapeRenderer().Save(path + "public\\download\\" + filename + ".png", options);
+                return;
             }
             else if (node.NodeType == NodeType.DrawingML)
             {
