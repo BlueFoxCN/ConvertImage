@@ -15,11 +15,19 @@ namespace ConvertImage
 {
     public partial class WebForm1 : System.Web.UI.Page
     {
-
+        public Hashtable listRecord = new Hashtable();
+        public Hashtable lists = new Hashtable();
         public string path = HttpContext.Current.Server.MapPath("~/");
         public int minFigHeight = 50;
         protected void Page_Load(object sender, EventArgs e)
         {
+            lists.Add("Arabic", new string[20] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" });
+            lists.Add("LowercaseLetter", new string[26] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" });
+            lists.Add("UppercaseLetter", new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" });
+            lists.Add("SimpChinNum3", new string[20] { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十" });
+            lists.Add("LowercaseRoman", new string[20] { "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx" });
+            lists.Add("UppercaseRoman", new string[20] { "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" });
+            lists.Add("KanjiDigit", new string[20] { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十" });
             string SaveLocation = "";
             if ((file.PostedFile != null) && (file.PostedFile.ContentLength > 0))
             {
@@ -66,10 +74,40 @@ namespace ConvertImage
             Response.End();
         }
 
+        public string getListText(Paragraph p)
+        {
+            int number = p.ListFormat.List.ListId;
+            string format = p.ListFormat.ListLevel.NumberFormat;
+            string ns = p.ListFormat.ListLevel.NumberStyle.ToString();
+            int order = 0;
+            string value = "";
+            if (listRecord.ContainsKey(number))
+            {
+                order = (int)(listRecord[number]);
+                listRecord[number] = (int)(listRecord[number]) + 1;
+            }
+            else
+            {
+                listRecord.Add(number, p.ListFormat.ListLevel.StartAt);
+                order = p.ListFormat.ListLevel.StartAt - 1;
+            }
+            if (lists.ContainsKey(ns))
+            {
+                value = (string)((Array)(lists[ns])).GetValue(order);
+            }
+            else
+            {
+                value = (string)((Array)(lists["Arabic"])).GetValue(order);
+            }
+            format.Replace("\0", value);
+            return format.Replace("\0", value);
+        }
+
         public ArrayList parseParagraph(Paragraph p)
         {
             ArrayList content = new ArrayList();
-            string curText = "";
+            // string curText = "";
+            string curText = getListText(p);
             string imgFileName = "";
             bool skip = false;
             foreach (Node node in p.GetChildNodes(NodeType.Any, false)) {
