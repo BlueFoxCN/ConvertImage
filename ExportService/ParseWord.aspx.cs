@@ -28,6 +28,7 @@ namespace ConvertImage
             lists.Add("LowercaseRoman", new string[20] { "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx" });
             lists.Add("UppercaseRoman", new string[20] { "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" });
             lists.Add("KanjiDigit", new string[20] { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十" });
+            lists.Add("NumberInCircle", new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" });
             string SaveLocation = "";
             if ((file.PostedFile != null) && (file.PostedFile.ContentLength > 0))
             {
@@ -76,6 +77,10 @@ namespace ConvertImage
 
         public string getListText(Paragraph p)
         {
+            if (!p.IsListItem)
+            {
+                return "";
+            }
             int number = p.ListFormat.List.ListId;
             string format = p.ListFormat.ListLevel.NumberFormat;
             string ns = p.ListFormat.ListLevel.NumberStyle.ToString();
@@ -91,16 +96,18 @@ namespace ConvertImage
                 listRecord.Add(number, p.ListFormat.ListLevel.StartAt);
                 order = p.ListFormat.ListLevel.StartAt - 1;
             }
-            if (lists.ContainsKey(ns))
+            if (lists.ContainsKey(ns) && order < ((Array)(lists[ns])).Length)
             {
                 value = (string)((Array)(lists[ns])).GetValue(order);
             }
             else
             {
-                value = (string)((Array)(lists["Arabic"])).GetValue(order);
+                value = (order + 1).ToString();
             }
-            format.Replace("\0", value);
-            return format.Replace("\0", value);
+            string numberStr = format.Replace("\0", value);
+            if (format.EndsWith("\0"))
+                numberStr = numberStr + " ";
+            return numberStr;
         }
 
         public ArrayList parseParagraph(Paragraph p)
