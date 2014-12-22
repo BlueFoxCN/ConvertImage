@@ -13,7 +13,7 @@ using System.Web.Script.Serialization;
 
 namespace ConvertImage
 {
-    public partial class WebForm1 : System.Web.UI.Page
+    public partial class ParseWord : System.Web.UI.Page
     {
         public Hashtable listRecord = new Hashtable();
         public Hashtable lists = new Hashtable();
@@ -30,13 +30,13 @@ namespace ConvertImage
             lists.Add("KanjiDigit", new string[20] { "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十" });
             lists.Add("NumberInCircle", new string[10] { "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩" });
             string SaveLocation = "";
-            if ((file.PostedFile != null) && (file.PostedFile.ContentLength > 0))
+            if ((word_file.PostedFile != null) && (word_file.PostedFile.ContentLength > 0))
             {
-                string fn = System.IO.Path.GetFileName(file.PostedFile.FileName);
+                string fn = System.IO.Path.GetFileName(word_file.PostedFile.FileName);
                 SaveLocation = Server.MapPath("data") + "\\" + fn;
                 try
                 {
-                    file.PostedFile.SaveAs(SaveLocation);
+                    word_file.PostedFile.SaveAs(SaveLocation);
                 }
                 catch (Exception ex)
                 {

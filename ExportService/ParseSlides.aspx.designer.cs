@@ -10,7 +10,7 @@
 namespace ConvertImage {
     
     
-    public partial class ParseWord {
+    public partial class ParseSlides {
         
         /// <summary>
         /// Form1 控件。
@@ -22,13 +22,13 @@ namespace ConvertImage {
         protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
         
         /// <summary>
-        /// word_file 控件。
+        /// ppt_file 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputFile word_file;
+        protected global::System.Web.UI.HtmlControls.HtmlInputFile ppt_file;
         
         /// <summary>
         /// Submit1 控件。

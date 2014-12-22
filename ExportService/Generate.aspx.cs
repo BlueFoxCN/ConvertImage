@@ -99,10 +99,10 @@ namespace ConvertImage
                     }
 
                     // insert the figures
-                    foreach (string fig in q.figures)
-                    {
-                        writeFigure(builder, fig);
-                    }
+                    // foreach (string fig in q.figures)
+                    // {
+                    //     writeFigure(builder, fig);
+                    // }
 
                     // insert the items if this is a choice question
                     if (q.type == "choice")
@@ -200,6 +200,15 @@ namespace ConvertImage
                     builder.InsertNode(newShape);
                 }
                 else if (ele.StartsWith("equ_"))
+                {
+                    imageInfo = ele.Substring(4).Split('*');
+                    shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
+                    shape.Width = Convert.ToDouble(imageInfo[1]);
+                    shape.Height = Convert.ToDouble(imageInfo[2]);
+                    shape.WrapType = WrapType.Inline;
+                    shape.VerticalAlignment = VerticalAlignment.Inline;
+                }
+                else if (ele.StartsWith("fig_"))
                 {
                     imageInfo = ele.Substring(4).Split('*');
                     shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
