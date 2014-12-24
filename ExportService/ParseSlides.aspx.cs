@@ -48,8 +48,11 @@ namespace ConvertImage
             {
                 bmp = pres.Slides[i].GetThumbnail(1f, 1f);
                 imageNameAry[i] = Guid.NewGuid().ToString();
-                savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i];
-                bmp.Save(@savePath);
+                savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + ".jpg";
+                bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                bmp = pres.Slides[i].GetThumbnail(0.2f, 0.2f);
+                savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + "_thumb.jpg";
+                bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
             }
 
             Response.Clear();
