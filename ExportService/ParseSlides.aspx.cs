@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Drawing;
+using System.Collections;
 using Aspose.Slides;
 using Aspose.Slides.Pptx;
 using ImageMagick;
@@ -35,31 +36,44 @@ namespace ConvertImage
             {
                 return;
             }
-
-            PresentationEx pres = new PresentationEx(@SaveLocation);
-
-            int count = pres.Slides.Count;
-
-            string[] imageNameAry = new string[pres.Slides.Count];
-
-            Bitmap bmp;
-            string savePath = "";
-            for (int i = 0; i < pres.Slides.Count; i++)
+            ArrayList data = new ArrayList();
+            try
             {
-                bmp = pres.Slides[i].GetThumbnail(1f, 1f);
-                imageNameAry[i] = Guid.NewGuid().ToString();
-                savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + ".jpg";
-                bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
-                bmp = pres.Slides[i].GetThumbnail(0.2f, 0.2f);
-                savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + "_thumb.jpg";
-                bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                PresentationEx pres = new PresentationEx(@SaveLocation);
+
+
+                int count = pres.Slides.Count;
+
+                string[] imageNameAry = new string[pres.Slides.Count];
+
+                Bitmap bmp;
+                string savePath = "";
+                for (int i = 0; i < pres.Slides.Count; i++)
+                {
+                    bmp = pres.Slides[i].GetThumbnail(1f, 1f);
+                    imageNameAry[i] = Guid.NewGuid().ToString();
+                    savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + ".jpg";
+                    bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    bmp = pres.Slides[i].GetThumbnail(0.2f, 0.2f);
+                    savePath = Server.MapPath("public/slides") + "\\" + imageNameAry[i] + "_thumb.jpg";
+                    bmp.Save(@savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+
+                data.Add(true);
+                data.Add(imageNameAry);
+                Response.Clear();
+                var json = new JavaScriptSerializer().Serialize(data);
+                Response.Write(json);
+                Response.End();
             }
-
-            Response.Clear();
-            var json = new JavaScriptSerializer().Serialize(imageNameAry);
-            Response.Write(json);
-
-            Response.End();
+            catch (PptxUnsupportedFormatException)
+            {
+                Response.Clear();
+                data.Add(false);
+                var j1 = new JavaScriptSerializer().Serialize(data);
+                Response.Write(j1);
+                Response.End();
+            }
         }
     }
 }

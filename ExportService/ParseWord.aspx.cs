@@ -48,31 +48,43 @@ namespace ConvertImage
             {
                 return;
             }
-            
-            Document doc = new Document(@SaveLocation);
+            ArrayList data = new ArrayList();
+            try
+            {
+                Document doc = new Document(@SaveLocation);
 
-            ArrayList content = new ArrayList();
-
-            foreach (Node node in doc.Sections[0].Body.GetChildNodes(NodeType.Any, false)) {
-                switch (node.NodeType)
-                {
-                    case NodeType.Paragraph:
-                        content.AddRange(parseParagraph((Paragraph)node));
-                        break;
-                    case NodeType.Table:
-                        content.Add(parseTable((Aspose.Words.Tables.Table)node));
-                        break;
-                    case NodeType.Shape:
-                        content.Add(node);
-                        break;
+                ArrayList content = new ArrayList();
+                foreach (Node node in doc.Sections[0].Body.GetChildNodes(NodeType.Any, false)) {
+                    switch (node.NodeType)
+                    {
+                        case NodeType.Paragraph:
+                            content.AddRange(parseParagraph((Paragraph)node));
+                            break;
+                        case NodeType.Table:
+                            content.Add(parseTable((Aspose.Words.Tables.Table)node));
+                            break;
+                        case NodeType.Shape:
+                            content.Add(node);
+                            break;
+                    }
                 }
+
+                data.Add(true);
+                data.Add(content);
+                Response.Clear();
+                var json = new JavaScriptSerializer().Serialize(data);
+                Response.Write(json);
+                Response.End();
+            }
+            catch (UnsupportedFileFormatException)
+            {
+                Response.Clear();
+                data.Add(false);
+                var j1 = new JavaScriptSerializer().Serialize(data);
+                Response.Write(j1);
+                Response.End();
             }
 
-            Response.Clear();
-            var json = new JavaScriptSerializer().Serialize(content);
-            Response.Write(json);
-
-            Response.End();
         }
 
         public string getListText(Paragraph p)
