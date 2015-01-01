@@ -44,13 +44,15 @@ namespace ConvertImage
                 ArrayList questions = new ArrayList(data.questions);
                 string fileName = data.name;
                 string qrcodeHost = data.qrcode_host;
+                string docType = data.doc_type;
+                bool qr_code = data.qr_code;
 
                 Shape shape;
                 string qrcode_path = "";
 
                 foreach (dynamic q in questions)
                 {
-                    if (q.link != null)
+                    if (q.link != null && qr_code)
                     {
                         // first get the qr_code image
                         qrcode_path = @Server.MapPath("public\\qrcodes\\" + q.link + ".png");
@@ -118,7 +120,8 @@ namespace ConvertImage
                         writeParagraph(builder, "");
                     }
                 }
-                string finalName = "public/documents/" + fileName + "-" + Guid.NewGuid().ToString() + ".docx";
+                string finalName = "public/documents/" + fileName + "-" + Guid.NewGuid().ToString();
+                finalName += docType == "word" ? ".docx" : ".pdf";
                 doc.Save(@Server.MapPath(finalName));
                 Response.Clear();
                 Response.Write(finalName);
