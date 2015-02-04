@@ -18,7 +18,7 @@ namespace ConvertImage
         public Hashtable listRecord = new Hashtable();
         public Hashtable lists = new Hashtable();
         public string path = HttpContext.Current.Server.MapPath("~/");
-        public int minFigHeight = 50;
+        public int minFigHeight = 55;
         protected void Page_Load(object sender, EventArgs e)
         {
             lists.Add("Arabic", new string[20] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" });
@@ -261,7 +261,7 @@ namespace ConvertImage
             else if (node.NodeType == NodeType.Shape && ((Shape)node).OleFormat != null)
             {
 
-                if (((Shape)node).OleFormat.ProgId.Contains("DSMT") || ((Shape)node).OleFormat.ProgId.Contains("Equation.3"))
+                if (((Shape)node).OleFormat.ProgId.Contains("DSMT") || ((Shape)node).OleFormat.ProgId.Contains("Equation.3") || ((Shape)node).OleFormat.ProgId.Contains("Excel.Sheet.8"))
                 {
                     return new string[] { "mathtype", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
                 }
