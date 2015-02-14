@@ -192,22 +192,18 @@ namespace ConvertImage
                         break;
                     case "mathtype":
                         imgFileName = Guid.NewGuid().ToString();
-                        convertImage(node, imgFileName);
+                        convertImage(typeInfo[0], node, imgFileName);
                         saveMathtype((Shape)node, imgFileName);
-                        curText += "$$math_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
-                        break;
-                    case "equation":
-                        imgFileName = Guid.NewGuid().ToString();
-                        convertImage(node, imgFileName);
-                        curText += "$$equ_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
+                        curText += "$$math_" + imgFileName + "*png*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
                         break;
                     case "figure":
                         if (curText != "")
                             content.Add(curText);
                         curText = "";
                         imgFileName = Guid.NewGuid().ToString();
-                        convertImage(node, imgFileName);
-                        content.Add("$$fig_" + imgFileName + "*" + typeInfo[1] + "*" + typeInfo[2] + "$$");
+                        
+                        convertImage(typeInfo[0], node, imgFileName);
+                        content.Add("$$fig_" + imgFileName + "*png*" + typeInfo[1] + "*" + typeInfo[2] + "$$");
                         break;
                 }
             }
@@ -271,21 +267,13 @@ namespace ConvertImage
                 }
                 
             }
-            else if (node.NodeType == NodeType.Shape && !((Shape)node).IsInline)
+            else if (node.NodeType == NodeType.Shape)
             {
                 return new string[] { "figure", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
-            }
-            else if (node.NodeType == NodeType.DrawingML && ((DrawingML)node).Height < minFigHeight)
-            {
-                return new string[] { "equation", ((DrawingML)node).Width.ToString(), ((DrawingML)node).Height.ToString() };
             }
             else if (node.NodeType == NodeType.DrawingML)
             {
                 return new string[] { "figure", ((DrawingML)node).Width.ToString(), ((DrawingML)node).Height.ToString() };
-            }
-            else if (node.NodeType == NodeType.Shape && ((Shape)node).IsInline)
-            {
-                return new string[] { "equation", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
             }
             else if (node.NodeType == NodeType.GroupShape)
             {
@@ -297,7 +285,7 @@ namespace ConvertImage
             }
         }
 
-        public void convertImage(Node node, string filename)
+        public void convertImage(string type, Node node, string filename)
         {
             byte[] id;
             ImageSaveOptions options = new Aspose.Words.Saving.ImageSaveOptions(SaveFormat.Png);

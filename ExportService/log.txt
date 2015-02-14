@@ -70,4 +70,4 @@ by Jesse记录时间：2014-10-23 16:11:11,718 线程ID:[8] 日志级别：INFO  出错类：Con
 3cm的水，若放入三个相同的珠（球的半么与圆柱的底面半径相同）后，水恰好淹没最上面的球（如图所示），则球的半径是____cm."],items:[],link:"DfBaF",figures:["$$fig_bb209f41-8fed-435d-8a77-8fc39fea325d*65.25*129.75$$"]},type:"analysis",content:["6.（2010湖南理数）13．图3中的三个直角三角形是一个体积为
 20$$math_6f13f466-c550-4ab9-a175-436bfc00e8b1*21.75*15.75$$的几何体的三视图，则$$math_acab9b84-0bc7-4e76-ae43-168cda30f4e7*18.75*14.25$$$$und_      $$$$math_2839a54c-73a2-47d6-97de-a6d74131acb1*18*11.25$$．"],items:[],link:"ouy4J",figures:["$$fig_b4df9d8b-9ad0-4cfb-9ad6-9748268a970d*288*228.75$$"]},type:"analysis",content:["7.（2010湖北理数）13.圆柱形容器内部盛有高度为8cm的水，若放入三个相同的球（球的半径与圆柱的底面半径相同）后，水恰好淹没最上面
 的球（如图所示），则球的半径是$$und_             $$cm。"],items:[],link:"hEl76",figures:["$$fig_ab403527-1523-4215-9f0a-2582883d5d5d*100.5*163.5$$"]}],name:"测试",qrcode_host:"http://demo.b-fox.cn"}
-by Jesse
+by Jesseby Jesseby Jesseby Jesse

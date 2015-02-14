@@ -62,12 +62,6 @@ namespace ConvertImage
                         }
                     }
 
-                    // insert the figures
-                    // foreach (string fig in q.figures)
-                    // {
-                    //     writeFigure(builder, fig);
-                    // }
-
                     // insert the items if this is a choice question
                     if (q.type == "choice")
                     {
