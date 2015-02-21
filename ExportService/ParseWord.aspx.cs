@@ -197,13 +197,9 @@ namespace ConvertImage
                         curText += "$$math_" + imgFileName + "*png*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
                         break;
                     case "figure":
-                        if (curText != "")
-                            content.Add(curText);
-                        curText = "";
                         imgFileName = Guid.NewGuid().ToString();
-                        
                         convertImage(typeInfo[0], node, imgFileName);
-                        content.Add("$$fig_" + imgFileName + "*png*" + typeInfo[1] + "*" + typeInfo[2] + "$$");
+                        curText += "$$fig_" + imgFileName + "*png*" + typeInfo[1] + "*" + typeInfo[2] + "$$";
                         break;
                 }
             }

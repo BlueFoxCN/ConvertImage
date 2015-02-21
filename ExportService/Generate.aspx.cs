@@ -20,6 +20,8 @@ namespace ConvertImage
     {
         private int[] LEN_THRESH = new int[] { 10, 20 };
         private int LINE_LEN = 80;
+        private string image_path = "";
+        private WebClient wc = new WebClient();
         protected void Page_Load(object sender, EventArgs e)
         {
             log4net.ILog log = log4net.LogManager.GetLogger(typeof(Generate));
@@ -52,6 +54,14 @@ namespace ConvertImage
 
                 foreach (dynamic q in questions)
                 {
+                    if (q.image_path == null)
+                    {
+                        image_path = "";
+                    }
+                    else
+                    {
+                        image_path = q.image_path;
+                    }
                     if (q.link != null && qr_code)
                     {
                         // first get the qr_code image
@@ -169,15 +179,6 @@ namespace ConvertImage
             return c[d];
         }
 
-        private void writeFigure(DocumentBuilder builder, string fig)
-        {
-            string[] imageInfo = fig.Substring(6, fig.Length - 8).Split('*');
-            Shape shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
-            shape.Width = Convert.ToDouble(imageInfo[1]);
-            shape.Height = Convert.ToDouble(imageInfo[2]);
-            shape.WrapType = WrapType.Inline;
-        }
-
         private void writeParagraph(DocumentBuilder builder, string p, bool newLine = true)
         {
             Font font = builder.Font;
@@ -199,18 +200,32 @@ namespace ConvertImage
                 else if (ele.StartsWith("equ_"))
                 {
                     imageInfo = ele.Substring(4).Split('*');
-                    shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
-                    shape.Width = Convert.ToDouble(imageInfo[1]);
-                    shape.Height = Convert.ToDouble(imageInfo[2]);
+                    if (image_path == "")
+                    {
+                        shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + "." + imageInfo[1]));
+                    }
+                    else
+                    {
+                        shape = builder.InsertImage(wc.DownloadData(image_path + imageInfo[0] + "." + imageInfo[1]));
+                    }
+                    shape.Width = Convert.ToDouble(imageInfo[2]);
+                    shape.Height = Convert.ToDouble(imageInfo[3]);
                     shape.WrapType = WrapType.Inline;
                     shape.VerticalAlignment = VerticalAlignment.Inline;
                 }
                 else if (ele.StartsWith("fig_"))
                 {
                     imageInfo = ele.Substring(4).Split('*');
-                    shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + ".png"));
-                    shape.Width = Convert.ToDouble(imageInfo[1]);
-                    shape.Height = Convert.ToDouble(imageInfo[2]);
+                    if (image_path == "")
+                    {
+                        shape = builder.InsertImage(@Server.MapPath("public\\download\\" + imageInfo[0] + "." + imageInfo[1]));
+                    }
+                    else
+                    {
+                        shape = builder.InsertImage(wc.DownloadData(image_path + imageInfo[0] + "." + imageInfo[1]));
+                    }
+                    shape.Width = Convert.ToDouble(imageInfo[2]);
+                    shape.Height = Convert.ToDouble(imageInfo[3]);
                     shape.WrapType = WrapType.Inline;
                     shape.VerticalAlignment = VerticalAlignment.Inline;
                 }
