@@ -52,6 +52,64 @@ namespace ConvertImage
                 Shape shape;
                 string qrcode_path = "";
 
+                if (data.app_qr_code)
+                {
+                    // should insert app download info at the beginning
+                    string android_app_qrcode_path = @Server.MapPath("public\\qrcodes\\android_app_qrcode.png");
+                    string ios_app_qrcode_path = @Server.MapPath("public\\qrcodes\\ios_app_qrcode.png");
+                    if (!File.Exists(android_app_qrcode_path))
+                    {
+                        HttpWebRequest httpRequest = (HttpWebRequest)
+                            WebRequest.Create(qrcodeHost + "/student_android_app_qr_code");
+                        httpRequest.Method = WebRequestMethods.Http.Get;
+
+                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                        using (Stream inputStream = httpResponse.GetResponseStream())
+                        using (Stream outputStream = File.OpenWrite(android_app_qrcode_path))
+                        {
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            do
+                            {
+                                bytesRead = inputStream.Read(buffer, 0, buffer.Length);
+                                outputStream.Write(buffer, 0, bytesRead);
+                            } while (bytesRead != 0);
+                        }
+                    }
+                    if (!File.Exists(ios_app_qrcode_path))
+                    {
+                        HttpWebRequest httpRequest = (HttpWebRequest)
+                            WebRequest.Create(qrcodeHost + "/student_ios_app_qr_code");
+                        httpRequest.Method = WebRequestMethods.Http.Get;
+
+                        HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                        using (Stream inputStream = httpResponse.GetResponseStream())
+                        using (Stream outputStream = File.OpenWrite(ios_app_qrcode_path))
+                        {
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            do
+                            {
+                                bytesRead = inputStream.Read(buffer, 0, buffer.Length);
+                                outputStream.Write(buffer, 0, bytesRead);
+                            } while (bytesRead != 0);
+                        }
+                    }
+
+                    builder.Write("Android客户端下载：");
+                    shape = builder.InsertImage(android_app_qrcode_path);
+                    shape.WrapType = WrapType.Inline;
+                    shape.VerticalAlignment = VerticalAlignment.Inline;
+                    builder.Write("     ");
+                    builder.Write("iOS客户端下载：");
+                    shape = builder.InsertImage(ios_app_qrcode_path);
+                    shape.WrapType = WrapType.Inline;
+                    shape.VerticalAlignment = VerticalAlignment.Inline;
+                    builder.Write("\n");
+                    builder.Writeln("学生网页版登录地址： " + data.student_portal_url);
+                    builder.Writeln("");
+                }
+
                 foreach (dynamic q in questions)
                 {
                     if (q.image_path == null)
@@ -69,7 +127,7 @@ namespace ConvertImage
                         if (!File.Exists(qrcode_path))
                         {
                             HttpWebRequest httpRequest = (HttpWebRequest)
-                            WebRequest.Create(qrcodeHost + "/qrcodes?link=" + q.link);
+                                WebRequest.Create(qrcodeHost + "/qrcodes?link=" + q.link);
                             httpRequest.Method = WebRequestMethods.Http.Get;
 
                             HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse();
