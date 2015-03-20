@@ -20,6 +20,7 @@ namespace ConvertImage
         private int LINE_LEN = 80;
         private string image_path = "";
         private WebClient wc = new WebClient();
+        private string[] item_ary = new string[] { "A", "B", "C", "D" };
         protected void Page_Load(object sender, EventArgs e)
         {
             log4net.ILog log = log4net.LogManager.GetLogger(typeof(Generate));
@@ -82,10 +83,48 @@ namespace ConvertImage
                         }
                     }
 
-                    // insert note if there is any
-                    if (q.note_type != null && q.note_type != 0)
+                    // insert answers
+                    if ( q.answer_not_ready == true || ( q.answer == -1 && q.answer_content.Count == 0 ) )
                     {
-                        writeNoteType(builder, q.note_type);
+                        Font font = builder.Font;
+                        font.Bold = true;
+                        builder.Write("未上传答案或答案未公布");
+                        builder.Writeln("");
+                        font.Bold = false;
+                    } else
+                    {
+                        Font font = builder.Font;
+                        font.Bold = true;
+                        builder.Write("解答：");
+                        font.Bold = false;
+                        if (q.answer != -1)
+                        {
+                            builder.Write(item_ary[q.answer]);
+                        }
+                        builder.Writeln("");
+                        foreach (dynamic para in q.answer_content)
+                        {
+                            if (para is string)
+                            {
+                                writeParagraph(builder, (string)para);
+                            }
+                            else
+                            {
+                                switch ((string)(para["type"]))
+                                {
+                                    case "table":
+                                        writeTable(builder, para["content"]);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+
+                    // insert note if there is any
+                    if (q.tag != null && q.tag != "")
+                    {
+                        writeNoteType(builder, q.tag);
                     }
 
                     if (q.topics != null && q.topics.Count > 0)
@@ -149,24 +188,12 @@ namespace ConvertImage
             font.Color = System.Drawing.Color.Black;
         }
 
-        private void writeNoteType(DocumentBuilder builder, int noteType)
+        private void writeNoteType(DocumentBuilder builder, string tag)
         {
             Font font = builder.Font;
             font.Bold = true;
             font.Color = System.Drawing.Color.Red;
-            builder.Write("错误类型：");
-            switch (noteType)
-            {
-                case 1:
-                    builder.Write("不懂");
-                    break;
-                case 2:
-                    builder.Write("不会");
-                    break;
-                case 3:
-                    builder.Write("不对");
-                    break;
-            }
+            builder.Write("标签：" + tag);
             builder.Writeln("");
             font.Bold = false;
             font.Color = System.Drawing.Color.Black;
