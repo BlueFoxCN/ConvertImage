@@ -21,6 +21,8 @@ namespace ConvertImage
         public int minFigHeight = 55;
         protected void Page_Load(object sender, EventArgs e)
         {
+            string jid = job_id.Value;
+            Progress.progress[jid] = 0;
             lists.Add("Arabic", new string[20] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" });
             lists.Add("LowercaseLetter", new string[26] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" });
             lists.Add("UppercaseLetter", new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" });
@@ -51,9 +53,14 @@ namespace ConvertImage
             ArrayList data = new ArrayList();
             try
             {
+                
                 Document doc = new Document(@SaveLocation);
 
+
+
                 ArrayList content = new ArrayList();
+                int listLen = doc.Sections[0].Body.GetChildNodes(NodeType.Any, false).Count;
+                int i = 0;
                 foreach (Node node in doc.Sections[0].Body.GetChildNodes(NodeType.Any, false)) {
                     switch (node.NodeType)
                     {
@@ -67,8 +74,9 @@ namespace ConvertImage
                             content.Add(node);
                             break;
                     }
+                    i++;
+                    Progress.progress[jid] = 1.0 * i / listLen;
                 }
-
                 data.Add(true);
                 data.Add(content);
                 Response.Clear();
@@ -143,7 +151,7 @@ namespace ConvertImage
                 {
                     continue;
                 }
-                
+
                 string[] typeInfo = judgeType(node);
                 switch (typeInfo[0])
                 {
@@ -237,11 +245,11 @@ namespace ConvertImage
 
         public string[] judgeType(Node node)
         {
-            if (node.NodeType == NodeType.Shape && ((Shape)node).ImageData.ImageType.ToString().ToLower() == "noimage")
+            if (node.NodeType == NodeType.Shape && ((Shape)node).ImageData.ImageType == ImageType.NoImage)
             {
                 return new string[] { "unknown", "", "" };
             }
-            if (node.NodeType == NodeType.DrawingML && ((DrawingML)node).ImageData.ImageType.ToString().ToLower() == "noimage")
+            if (node.NodeType == NodeType.DrawingML && ((DrawingML)node).ImageData.ImageType == ImageType.NoImage)
             {
                 return new string[] { "unknown", "", "" };
             }
@@ -252,8 +260,8 @@ namespace ConvertImage
             }
             else if (node.NodeType == NodeType.Shape && ((Shape)node).OleFormat != null)
             {
-
-                if (((Shape)node).OleFormat.ProgId.Contains("DSMT") || ((Shape)node).OleFormat.ProgId.Contains("Equation.3") || ((Shape)node).OleFormat.ProgId.Contains("Excel.Sheet.8"))
+                string prog_id = ((Shape)node).OleFormat.ProgId;
+                if (prog_id.Contains("DSMT") || prog_id.Contains("Equation.3") || prog_id.Contains("Excel.Sheet.8"))
                 {
                     return new string[] { "mathtype", ((Shape)node).Width.ToString(), ((Shape)node).Height.ToString() };
                 }
@@ -284,12 +292,12 @@ namespace ConvertImage
         public void convertImage(string type, Node node, string filename)
         {
             byte[] id;
-            ImageSaveOptions options = new Aspose.Words.Saving.ImageSaveOptions(SaveFormat.Png);
             if (node.NodeType == NodeType.Shape)
             {
                 // issue 1_clip
                 if (!((Shape)node).HasImage)
                 {
+                    ImageSaveOptions options = new Aspose.Words.Saving.ImageSaveOptions(SaveFormat.Png);
                     ((Shape)node).GetShapeRenderer().Save(path + "public\\download\\" + filename + ".png", options);
                     return;
                 }
@@ -297,6 +305,7 @@ namespace ConvertImage
             }
             else if (node.NodeType == NodeType.GroupShape)
             {
+                ImageSaveOptions options = new Aspose.Words.Saving.ImageSaveOptions(SaveFormat.Png);
                 // issue 2_word_image
                 ((GroupShape)node).GetShapeRenderer().Save(path + "public\\download\\" + filename + ".png", options);
                 return;
@@ -309,13 +318,15 @@ namespace ConvertImage
             {
                 return;
             }
+            
             using (MagickImage image = new MagickImage(id))
             {
-                image.Transparent(new MagickColor("#FFFFFFFF"));
+                // image.Transparent(new MagickColor("#FFFFFFFF"));
                 if (image.Format == MagickFormat.Wmf)
                 {
                     image.Resize(new Percentage(0.1));
                 }
+                
                 image.Write(path + "public\\download\\" + filename + ".png");
             }
         }
