@@ -21,8 +21,6 @@ namespace ConvertImage
         public int minFigHeight = 55;
         protected void Page_Load(object sender, EventArgs e)
         {
-            string jid = job_id.Value;
-            Progress.progress[jid] = 0;
             lists.Add("Arabic", new string[20] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" });
             lists.Add("LowercaseLetter", new string[26] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" });
             lists.Add("UppercaseLetter", new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" });
@@ -59,8 +57,6 @@ namespace ConvertImage
 
 
                 ArrayList content = new ArrayList();
-                int listLen = doc.Sections[0].Body.GetChildNodes(NodeType.Any, false).Count;
-                int i = 0;
                 foreach (Node node in doc.Sections[0].Body.GetChildNodes(NodeType.Any, false)) {
                     switch (node.NodeType)
                     {
@@ -74,8 +70,6 @@ namespace ConvertImage
                             content.Add(node);
                             break;
                     }
-                    i++;
-                    Progress.progress[jid] = 1.0 * i / listLen;
                 }
                 data.Add(true);
                 data.Add(content);

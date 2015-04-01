@@ -84,41 +84,46 @@ namespace ConvertImage
                     }
 
                     // insert answers
-                    if ( q.answer_not_ready == true || ( q.answer == -1 && q.answer_content.Count == 0 ) )
+                    if (q.has_answer)
                     {
-                        Font font = builder.Font;
-                        font.Bold = true;
-                        builder.Write("未上传答案或答案未公布");
-                        builder.Writeln("");
-                        font.Bold = false;
-                    } else
-                    {
-                        Font font = builder.Font;
-                        font.Bold = true;
-                        builder.Write("解答：");
-                        font.Bold = false;
-                        if (q.answer != -1)
+                        if (q.answer == -1 && q.answer_content.Count == 0)
                         {
-                            builder.Write(item_ary[q.answer]);
+                            Font font = builder.Font;
+                            font.Bold = true;
+                            builder.Write("未上传答案或答案未公布");
+                            builder.Writeln("");
+                            font.Bold = false;
                         }
-                        builder.Writeln("");
-                        foreach (dynamic para in q.answer_content)
+                        else
                         {
-                            if (para is string)
+                            Font font = builder.Font;
+                            font.Bold = true;
+                            builder.Write("解答：");
+                            font.Bold = false;
+                            if (q.answer != -1)
                             {
-                                writeParagraph(builder, (string)para);
+                                builder.Write(item_ary[q.answer]);
                             }
-                            else
+                            builder.Writeln("");
+                            foreach (dynamic para in q.answer_content)
                             {
-                                switch ((string)(para["type"]))
+                                if (para is string)
                                 {
-                                    case "table":
-                                        writeTable(builder, para["content"]);
-                                        break;
+                                    writeParagraph(builder, (string)para);
+                                }
+                                else
+                                {
+                                    switch ((string)(para["type"]))
+                                    {
+                                        case "table":
+                                            writeTable(builder, para["content"]);
+                                            break;
+                                    }
                                 }
                             }
                         }
                     }
+
 
 
                     // insert note if there is any

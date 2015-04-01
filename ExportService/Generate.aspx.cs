@@ -22,6 +22,7 @@ namespace ConvertImage
         private int LINE_LEN = 80;
         private string image_path = "";
         private WebClient wc = new WebClient();
+        private string[] item_ary = new string[] { "A", "B", "C", "D" };
         protected void Page_Load(object sender, EventArgs e)
         {
             log4net.ILog log = log4net.LogManager.GetLogger(typeof(Generate));
@@ -48,6 +49,12 @@ namespace ConvertImage
                 string qrcodeHost = data.qrcode_host;
                 string docType = data.doc_type;
                 bool qr_code = data.qr_code;
+                bool withNumber = data.with_number;
+                bool firstLine = false;
+                bool withAnswer = data.with_answer;
+                int number = 1;
+                string para_with_number = "";
+                
 
                 Shape shape;
                 string qrcode_path = "";
@@ -151,11 +158,22 @@ namespace ConvertImage
                     }
 
                     // insert the question content
+                    firstLine = true;
                     foreach (dynamic para in q.content)
                     {
                         if (para is string)
                         {
-                            writeParagraph(builder, (string)para);
+                            if (withNumber && firstLine)
+                            {
+                                firstLine = false;
+                                para_with_number = number.ToString() + ". " + para;
+                                number++;
+                            }
+                            else
+                            {
+                                para_with_number = para;
+                            }
+                            writeParagraph(builder, (string)para_with_number);
                         }
                         else
                         {
@@ -177,6 +195,41 @@ namespace ConvertImage
                             writeParagraph(builder, itemLine);
                         }
                     }
+
+                    // insert answers
+                    if (withAnswer)
+                    {
+                        if (q.answer != -1 || q.answer_content.Count > 0)
+                        {
+                            Font font = builder.Font;
+                            font.Bold = true;
+                            builder.Write("解答：");
+                            font.Bold = false;
+                            if (q.answer != -1)
+                            {
+                                builder.Write(item_ary[q.answer]);
+                            }
+                            builder.Writeln("");
+                            foreach (dynamic para in q.answer_content)
+                            {
+                                if (para is string)
+                                {
+                                    writeParagraph(builder, (string)para);
+                                }
+                                else
+                                {
+                                    switch ((string)(para["type"]))
+                                    {
+                                        case "table":
+                                            writeTable(builder, para["content"]);
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
                     for (int i = 0; i < 3; i++)
                     {
                         writeParagraph(builder, "");
